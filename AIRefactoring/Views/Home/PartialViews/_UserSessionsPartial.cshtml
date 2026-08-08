@@ -1,0 +1,22 @@
+﻿@model UserSessionsModel;
+
+<button type="button" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+	<span></span>
+	<span></span>
+	<span></span>
+</button>
+
+<div id="sidebar" class="sidebar open">
+	<div class="sidebar-header">
+		<span class="sidebar-title">Sessions</span>
+		<button type="button" class="close-btn" onclick="toggleSidebar()" aria-label="Close sidebar"> &times; </button>
+	</div>
+	<div class="sidebar-content">
+		@foreach(var item in Model.UserSessions)
+		{
+			<div class="sidebar-item">
+				@item.Title
+			</div>
+		}
+	</div>
+</div>

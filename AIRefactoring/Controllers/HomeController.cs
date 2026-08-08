@@ -1,16 +1,18 @@
+using AIRefactoring.Database;
 using AIRefactoring.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace AIRefactoring.Controllers
 {
 	public class HomeController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;
+		private readonly ApplicationDbContext dbContext;
 
-		public HomeController(ILogger<HomeController> logger)
+		public HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
 		{
 			_logger = logger;
+			this.dbContext = dbContext;
 		}
 
 		public IActionResult Index()
@@ -18,15 +20,15 @@ namespace AIRefactoring.Controllers
 			return View();
 		}
 
-		public IActionResult Privacy()
+		[HttpGet]
+		public IActionResult GetSessions(Guid guestIdentifier)
 		{
-			return View();
-		}
+			var model = new UserSessionsModel()
+			{
+				UserSessions = [.. dbContext.UserSessions.Where(x => x.GuestIdentifier == guestIdentifier)]
+			};
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error()
-		{
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+			return PartialView("~/Views/Home/PartialViews/_UserSessionsPartial.cshtml", model);
 		}
 	}
 }
