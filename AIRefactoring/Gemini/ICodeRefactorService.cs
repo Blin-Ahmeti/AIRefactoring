@@ -1,7 +1,9 @@
-﻿namespace AIRefactoring.Gemini
+﻿using AIRefactoring.Models;
+
+namespace AIRefactoring.Gemini
 {
 	public interface ICodeRefactorService
 	{
-		Task<string> RefactorCodeAsync(string code);
+		Task<RefactorResponse> RefactorCodeAsync(string code);
 	}
 }

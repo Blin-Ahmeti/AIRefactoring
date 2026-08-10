@@ -1,4 +1,5 @@
-﻿using Google.GenAI;
+﻿using AIRefactoring.Models;
+using Google.GenAI;
 using Google.GenAI.Types;
 
 namespace AIRefactoring.Gemini
@@ -41,10 +42,10 @@ namespace AIRefactoring.Gemini
 			};
 		}
 
-		public async Task<string> RefactorCodeAsync(string code)
+		public async Task<RefactorResponse> RefactorCodeAsync(string code)
 		{
 			if (string.IsNullOrWhiteSpace(code))
-				return string.Empty;
+				return new();
 
 			try
 			{
@@ -60,7 +61,11 @@ namespace AIRefactoring.Gemini
 						validation.ErrorMessage);
 				}
 
-				return response?.Text?.Trim() ?? string.Empty;
+				return new()
+				{
+					Title = title?.Text?.Trim() ?? string.Empty,
+					Code = response?.Text?.Trim() ?? string.Empty
+				};
 			}
 			catch (Exception ex)
 			{

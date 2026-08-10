@@ -35,8 +35,6 @@ namespace AIRefactoring.Database
 				entity.Property(e => e.GuestIdentifier).IsRequired();
 
 				entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
-				entity.Property(e => e.Prompt).IsRequired();
-				entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
 
 				entity.HasMany(d => d.CodeArtifacts).WithOne(p => p.UserSession).HasForeignKey(d => d.UserSessionId).OnDelete(DeleteBehavior.Cascade);
 			});
@@ -53,6 +51,7 @@ namespace AIRefactoring.Database
 
 				entity.Property(e => e.OriginalCode).IsRequired();
 				entity.Property(e => e.RefactoredCode).IsRequired();
+				entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
 			});
 		}
 	}

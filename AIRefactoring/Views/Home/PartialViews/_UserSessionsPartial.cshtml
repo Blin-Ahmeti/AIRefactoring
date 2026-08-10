@@ -12,11 +12,17 @@
 		<button type="button" class="close-btn" onclick="toggleSidebar()" aria-label="Close sidebar"> &times; </button>
 	</div>
 	<div class="sidebar-content">
-		@foreach(var item in Model.UserSessions)
+		<button type="button" class="new-session-button" onclick="startNewSession()">
+			<span class="new-session-icon">+</span>
+			<span>New Session</span>
+		</button>
+		@foreach (var item in Model.UserSessions)
 		{
-			<div class="sidebar-item">
+			<a class="sidebar-item @(item.Id == Model.CurrentSessionId ? "active" : "")"
+			   data-session-id="@item.Id"
+			   href="@Url.Action("Index", "Home", new { sessionId = item.Id })">
 				@item.Title
-			</div>
+			</a>
 		}
 	</div>
 </div>

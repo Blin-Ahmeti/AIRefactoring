@@ -1,31 +1,51 @@
-﻿<div class="d-flex">
+﻿@model HomeModel;
+
+@if (Model.UserSession != null)
+{
+	@Html.HiddenFor(x => x.UserSession!.Id)
+}
+
+<div class="d-flex">
 	<div id="sessions-container"></div>
 
 	<div id="main-container" class="d-flex flex-column w-100">
 		<div class="refactor-header">
 			<h2 class="title">AI Refactoring</h2>
-			<p class="subtitle"> Paste your code and tell AI what you'd like to improve.</p>
+			<p class="subtitle">Paste your code and tell AI what you'd like to improve.</p>
 		</div>
 
-		<div class="conversation">
-			<div class="message user-message">
-				<div class="message-header">
-					<span class="message-label">You</span>
-				</div>
-				<div id="prompt-content" class="message-content">
-				</div>
-			</div>
+		<div class="conversation" id="conversation">
+			@if(Model.UserSession != null)
+			{
+				foreach(var codeArtifact in Model.UserSession.CodeArtifacts)
+				{
+					<div class="message user-message">
 
-			<div class="message ai-message">
-				<div class="message-header">
-					<span class="message-label">AI Refactoring</span>
-				</div>
-				<pre id="response-content" class="message-content code-response"></pre>
-			</div>
+						<div class="message-header">
+							<span class="message-label">You</span>
+							<span class="message-date">@codeArtifact.CreatedAt.ToLocalTime()</span>
+						</div>
+
+						<div class="message-content">@codeArtifact.OriginalCode</div>
+
+					</div>
+
+					<div class="message ai-message">
+
+						<div class="message-header">
+							<span class="message-label">AI Refactoring</span>
+						</div>
+
+						<pre class="message-content code-response">@codeArtifact.RefactoredCode</pre>
+
+					</div>
+				}
+			}
 		</div>
 
 		<div class="refactor-input">
 			<textarea id="code-input" class="code-input" placeholder="Describe what you'd like to refactor..." spellcheck="false"></textarea>
+
 			<div class="input-footer">
 				<span class="input-hint">AI Refactoring</span>
 				<button type="button" id="refactor-button" class="refactor-button">Refactor</button>
