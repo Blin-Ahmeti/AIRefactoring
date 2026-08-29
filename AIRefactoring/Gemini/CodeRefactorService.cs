@@ -47,30 +47,23 @@ namespace AIRefactoring.Gemini
 			if (string.IsNullOrWhiteSpace(code))
 				return new();
 
-			try
+			var title = await client.Models.GenerateContentAsync(model, code, titleConfig);
+
+			var response = await client.Models.GenerateContentAsync(model, code, config);
+
+			var validation = validator.Validate(code, response?.Text);
+
+			if (!validation.IsValid)
 			{
-				var title = await client.Models.GenerateContentAsync(model, code, titleConfig);
-
-				var response = await client.Models.GenerateContentAsync(model, code, config);
-
-				var validation = validator.Validate(code, response?.Text);
-
-				if (!validation.IsValid)
-				{
-					throw new InvalidOperationException(
-						validation.ErrorMessage);
-				}
-
-				return new()
-				{
-					Title = title?.Text?.Trim() ?? string.Empty,
-					Code = response?.Text?.Trim() ?? string.Empty
-				};
+				throw new InvalidOperationException(
+					validation.ErrorMessage);
 			}
-			catch (Exception ex)
+
+			return new()
 			{
-				throw;
-			}
+				Title = title?.Text?.Trim() ?? string.Empty,
+				Code = response?.Text?.Trim() ?? string.Empty
+			};
 		}
 	}
 }

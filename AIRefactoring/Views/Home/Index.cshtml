@@ -1,56 +1,190 @@
-﻿@model HomeModel;
+﻿<link rel="stylesheet" href="~/css/Home/index.css" asp-append-version="true" />
 
-@if (Model.UserSession != null)
-{
-	@Html.HiddenFor(x => x.UserSession!.Id)
-}
+<div class="home-container">
+	<div class="welcome-message">
+		<div class="welcome-hero">
 
-<div class="d-flex">
-	<div id="sessions-container"></div>
+			<div class="welcome-content">
+				<h1>
+					Welcome to <span>AIRefactor</span>
+				</h1>
 
-	<div id="main-container" class="d-flex flex-column w-100">
-		<div class="refactor-header">
-			<h2 class="title">AI Refactoring</h2>
-			<p class="subtitle">Paste your code and tell AI what you'd like to improve.</p>
-		</div>
+				<div class="subtitle">
+					Your intelligent companion for writing clean,
+					maintainable, and high-performance code.
+				</div>
 
-		<div class="conversation" id="conversation">
-			@if(Model.UserSession != null)
-			{
-				foreach(var codeArtifact in Model.UserSession.CodeArtifacts)
-				{
-					<div class="message user-message">
+				<p class="description">
+					AIRefactor helps bridge the gap between functional code
+					and robust software design. Learn advanced refactoring
+					techniques while receiving intelligent explanations about
+					code smells, architectural improvements, and design patterns.
+				</p>
 
-						<div class="message-header">
-							<span class="message-label">You</span>
-							<span class="message-date">@codeArtifact.CreatedAt.ToLocalTime()</span>
-						</div>
+				<div class="nav-links">
 
-						<div class="message-content">@codeArtifact.OriginalCode</div>
+					<a href="/learn" class="nav-link-btn learn-btn">
+						<span class="btn-icon">📘</span>
+						Go to Learn
+						<span class="arrow">→</span>
+					</a>
 
-					</div>
+					<a href="/refactor" class="nav-link-btn refactor-btn">
+						<span class="btn-icon">&lt;/&gt;</span>
+						Go to Refactor
+						<span class="arrow">→</span>
+					</a>
 
-					<div class="message ai-message">
+				</div>
 
-						<div class="message-header">
-							<span class="message-label">AI Refactoring</span>
-						</div>
-
-						<pre class="message-content code-response">@codeArtifact.RefactoredCode</pre>
-
-					</div>
-				}
-			}
-		</div>
-
-		<div class="refactor-input">
-			<textarea id="code-input" class="code-input" placeholder="Describe what you'd like to refactor..." spellcheck="false"></textarea>
-
-			<div class="input-footer">
-				<span class="input-hint">AI Refactoring</span>
-				<button type="button" id="refactor-button" class="refactor-button">Refactor</button>
 			</div>
+
+			<div class="welcome-visual">
+
+				<div class="ai-glow"></div>
+
+				<div class="code-window">
+
+					<div class="window-header">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+
+					<div class="code-lines">
+						<div class="line long"></div>
+						<div class="line medium"></div>
+						<div class="line short"></div>
+						<div class="line medium"></div>
+					</div>
+
+					<div class="refactor-arrow">↓</div>
+
+					<div class="clean-code">
+						<span>&lt;/&gt;</span>
+						<span>✓</span>
+					</div>
+
+				</div>
+
+				<div class="ai-chip">
+					<div class="chip-face">
+						<span></span>
+						<span></span>
+					</div>
+				</div>
+
+			</div>
+
 		</div>
+
+		<div id="learn-section" class="learning-section">
+
+			<div class="section-heading">
+
+				<div>
+					<span class="section-label">LEARN WITH AI</span>
+
+					<h2>How learning refactoring works</h2>
+
+					<p>
+						Understand not only what should change in your code,
+						but why the change improves your software.
+					</p>
+				</div>
+
+			</div>
+
+
+			<div class="learning-grid">
+				<div class="learning-card">
+
+					<div class="feature-icon complexity-icon">
+						<div class="cube cube-1"></div>
+						<div class="cube cube-2"></div>
+						<div class="cube cube-3"></div>
+					</div>
+
+					<h3>Deconstruct Complexity</h3>
+
+					<p>
+						Break large, difficult functions into clean,
+						understandable and testable components.
+					</p>
+
+					<span class="technique">
+						Extract Method
+					</span>
+
+				</div>
+
+				<div class="learning-card">
+
+					<div class="feature-icon pattern-icon">
+						<span>⌘</span>
+					</div>
+
+					<h3>Optimize Design Patterns</h3>
+
+					<p>
+						Learn how architectural improvements and proven
+						patterns can solve deeper structural problems.
+					</p>
+
+					<span class="technique">
+						Better Architecture
+					</span>
+
+				</div>
+
+				<div class="learning-card">
+
+					<div class="feature-icon debt-icon">
+						<span>⚠</span>
+					</div>
+
+					<h3>Reduce Technical Debt</h3>
+
+					<p>
+						Identify redundant logic, dead code and performance
+						bottlenecks across your application.
+					</p>
+
+					<span class="technique">
+						Clean Code
+					</span>
+
+				</div>
+
+				<div class="learning-card">
+
+					<div class="feature-icon ai-icon">
+						<span>&lt;/&gt;</span>
+					</div>
+
+					<h3>Contextual AI Explanations</h3>
+
+					<p>
+						Understand the reasoning behind every modification
+						and build long-term clean-code intuition.
+					</p>
+
+					<span class="technique">
+						Learn the Why
+					</span>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="post-it-note">
+		<span class="tip-label">Refactor Tip</span>
+		<p id="tip-content">Loading tip...</p>
 	</div>
 </div>
 
+<script src="~/js/Home/index.js" asp-append-version="true"></script>

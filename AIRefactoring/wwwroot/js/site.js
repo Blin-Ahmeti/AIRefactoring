@@ -43,7 +43,7 @@ async function loadSessions(guestIdentifier) {
 
     try {
         const response = await fetch(
-            `/Home/GetSessions?guestIdentifier=${guestIdentifier}&userSessionId=${currentSessionId || ""}`
+            `/Refactor/GetSessions?guestIdentifier=${guestIdentifier}&userSessionId=${currentSessionId || ""}`
         );
 
         if (!response.ok) {

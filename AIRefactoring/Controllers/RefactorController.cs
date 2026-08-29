@@ -3,6 +3,7 @@ using AIRefactoring.Entities;
 using AIRefactoring.Gemini;
 using AIRefactoring.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AIRefactoring.Controllers
 {
@@ -17,6 +18,30 @@ namespace AIRefactoring.Controllers
 		{
 			this.codeRefactorService = codeRefactorService;
 			this.dbContext = dbContext;
+		}
+
+		public IActionResult Index(Guid? sessionId)
+		{
+			var userSession = dbContext.UserSessions
+				.Include(x => x.CodeArtifacts)
+				.FirstOrDefault(x => x.Id == sessionId);
+
+			return View(new RefactorModel() { UserSession = userSession });
+		}
+
+		[HttpGet("GetSessions")]
+		public IActionResult GetSessions(Guid guestIdentifier, Guid? userSessionId)
+		{
+			var model = new UserSessionsModel()
+			{
+				UserSessions = [.. dbContext.UserSessions
+					.Where(x => x.GuestIdentifier == guestIdentifier)
+					.OrderByDescending(x => x.CodeArtifacts
+					.Max(a => (DateTime?)a.CreatedAt))],
+				CurrentSessionId = userSessionId
+			};
+
+			return PartialView("~/Views/Refactor/PartialViews/_UserSessionsPartial.cshtml", model);
 		}
 
 		[HttpPost]
