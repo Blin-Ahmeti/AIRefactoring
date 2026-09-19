@@ -1,0 +1,114 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Improving Architecture</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Improving Architecture" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Improving Architecture</strong> focuses on high-level refactoring that reorganizes systemic boundaries, separates concerns across architectural layers, and establishes clear communication patterns between subsystems. While class-level refactorings clean up individual components, architectural refactoring ensures the overall system remains scalable, maintainable, and adaptable to changing business needs.
+    </p>
+
+    <p>
+        As systems mature, features are often patched across boundary lines, creating monolithic coupling, tangled dependencies, and blurred layer responsibilities. Re-architecting incrementally enables teams to transition from rigid, tightly coupled systems toward modular architectures (such as Clean Architecture, CQRS, or Domain-Driven Design) without disrupting operational stability.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Establishes strict boundaries between Presentation, Domain, Infrastructure, and Data Access layers.</li>
+        <li>Protects core business logic from UI frameworks, database drivers, and external API changes.</li>
+        <li>Facilitates high-level system testability through contract-driven integration and boundary mocking.</li>
+        <li>Enables team independence by allowing distinct modules to be developed, deployed, or scaled separately.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique when UI components execute database queries directly, domain logic relies on third-party SDKs, or data persistence models leak into API view representations:
+    </p>
+    <ul>
+        <li><strong>Separate Domain from Infrastructure:</strong> Move core business rules and entities into an independent domain layer free of framework-specific dependencies.</li>
+        <li><strong>Apply Command-Query Responsibility Segregation (CQRS):</strong> Separate read-heavy queries from state-mutating commands to optimize performance and security boundaries.</li>
+        <li><strong>Introduce Repository & Unit of Work Patterns:</strong> Abstract data access routines behind clean collection-oriented interfaces.</li>
+        <li><strong>Use Event-Driven Integration:</strong> Replace direct cross-module method invocations with domain events to decouple secondary side effects.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Monolithic API Controller mixing HTTP handling, database queries, business rules, and emailing
+public class OrderController
+{
+    public void PlaceOrder(int customerId, List&lt;int&gt; productIds)
+    {
+        using var db = new SqlConnection("Server=myServerAddress;Database=myDataBase;");
+        db.Open();
+
+        // Database logic directly inside presentation/controller layer
+        var user = db.QuerySingle("SELECT * FROM Users WHERE Id = " + customerId);
+        decimal total = 0;
+        foreach (var id in productIds)
+        {
+            var price = db.QuerySingle&lt;decimal&gt;("SELECT Price FROM Products WHERE Id = " + id);
+            total += price;
+        }
+
+        // Direct persistence write
+        db.Execute($"INSERT INTO Orders (UserId, Total) VALUES ({customerId}, {total})");
+
+        // Infrastructure call coupled inside HTTP endpoint
+        var smtp = new SmtpClient("smtp.mailserver.com");
+        smtp.SendMail(user.Email, "Order Confirmed", $"Total charged: {total:C}");
+    }
+}
+
+// AFTER (C#): Multi-layered architecture enforcing clean boundaries via Mediating Commands & Interfaces
+public record PlaceOrderCommand(int CustomerId, List&lt;int&gt; ProductIds) : IRequest&lt;bool&gt;;
+
+// Application Layer: Coordinates workflow without raw SQL or SMTP framework details
+public class PlaceOrderCommandHandler
+{
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IOrderRepository _orderRepository;
+    private readonly INotificationService _notificationService;
+
+    public PlaceOrderCommandHandler(
+        ICustomerRepository customerRepository,
+        IOrderRepository orderRepository,
+        INotificationService notificationService)
+    {
+        _customerRepository = customerRepository;
+        _orderRepository = orderRepository;
+        _notificationService = notificationService;
+    }
+
+    public async Task&lt;bool&gt; Handle(PlaceOrderCommand command)
+    {
+        var customer = await _customerRepository.GetByIdAsync(command.CustomerId);
+        var order = Order.Create(customer, command.ProductIds); // Rich Domain Model encapsulates logic
+
+        await _orderRepository.SaveAsync(order);
+        await _notificationService.SendOrderConfirmationAsync(customer.Email, order.Total);
+
+        return true;
+    }
+}
+
+// Presentation Layer: Lightweight delegate passing input to the architectural boundary
+public class OrderControllerRefactored
+{
+    private readonly IMediator _mediator;
+
+    public OrderControllerRefactored(IMediator mediator) =&gt; _mediator = mediator;
+
+    public async Task&lt;IActionResult&gt; PlaceOrder([FromBody] PlaceOrderCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return result ? Ok() : BadRequest();
+    }
+}</code></pre>
+
+</article>

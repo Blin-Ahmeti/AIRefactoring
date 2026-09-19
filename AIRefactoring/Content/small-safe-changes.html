@@ -1,0 +1,102 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Principle</span>
+            <h1>Small, Safe Changes</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringPrinciples.png" alt="Small, Safe Changes" />
+        </div>
+    </div>
+
+    <p>
+        The <strong>Small, Safe Changes</strong> principle emphasizes making refactoring edits in tiny, incremental steps rather than large, sweeping rewrites. By keeping each modification contained and running automated tests continuously between edits, developers can verify that the system's observable behavior remains unchanged.
+    </p>
+
+    <p>
+        Large-scale refactoring in a single pass introduces significant risk, making it difficult to isolate bugs when tests break or subtle regressions occur. Executing refactoring as a sequence of small, verifiable transformations ensures that if an error is introduced, the culprit is immediately obvious and easy to revert.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Minimizes downtime and broken builds by maintaining a working state after every edit.</li>
+        <li>Accelerates debugging: failures are pinpointed instantly to the last tiny step made.</li>
+        <li>Facilitates smoother code reviews through smaller, more digestible Pull Requests.</li>
+        <li>Relies heavily on a robust automated test suite (TDD/CI) to act as a safety net.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this principle whenever transforming legacy code or tackling large architecture migrations. Break complex refactorings down into atomic, automated steps—such as using IDE refactoring tools to rename symbols, extract methods step-by-step, or introduce interfaces incrementally. Run unit tests after each individual modification before proceeding to the next step.
+    </p>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// INITIAL STATE: Complex method handling validation, processing, and logging
+public class OrderService
+{
+    public void ProcessOrder(Order order)
+    {
+        if (order == null || order.Items.Count == 0)
+            throw new ArgumentException("Invalid order");
+
+        decimal total = 0;
+        foreach (var item in order.Items)
+        {
+            total += item.Price * item.Quantity;
+        }
+
+        Console.WriteLine($"Order {order.Id} processed. Total: {total:C}");
+    }
+}
+
+// STEP 1 (Small & Safe): Extract total calculation into a separate helper method
+public class OrderServiceRefactored
+{
+    public void ProcessOrder(Order order)
+    {
+        if (order == null || order.Items.Count == 0)
+            throw new ArgumentException("Invalid order");
+
+        decimal total = CalculateTotal(order);
+
+        Console.WriteLine($"Order {order.Id} processed. Total: {total:C}");
+    }
+
+    // Run tests after creating this method!
+    private decimal CalculateTotal(Order order)
+    {
+        decimal total = 0;
+        foreach (var item in order.Items)
+        {
+            total += item.Price * item.Quantity;
+        }
+        return total;
+    }
+}
+
+// STEP 2 (Small & Safe): Next incremental step, extract validation logic
+public class OrderServiceFinal
+{
+    public void ProcessOrder(Order order)
+    {
+        ValidateOrder(order);
+        decimal total = CalculateTotal(order);
+        LogOrderSummary(order.Id, total);
+    }
+
+    private void ValidateOrder(Order order)
+    {
+        if (order == null || order.Items.Count == 0)
+            throw new ArgumentException("Invalid order");
+    }
+
+    private decimal CalculateTotal(Order order) =>
+        order.Items.Sum(item =&gt; item.Price * item.Quantity);
+
+    private void LogOrderSummary(int orderId, decimal total) =&gt;
+        Console.WriteLine($"Order {orderId} processed. Total: {total:C}");
+}</code></pre>
+
+</article>

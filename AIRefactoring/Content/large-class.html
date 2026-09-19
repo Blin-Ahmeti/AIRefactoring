@@ -1,0 +1,98 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>Large Class</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="Large Class" />
+        </div>
+    </div>
+
+    <p>
+        A <strong>Large Class</strong> (often referred to as a <em>God Class</em> or <em>Monster Class</em>) is a class that has accumulated too many fields, properties, methods, and responsibilities. It usually happens gradually as developers repeatedly add new features to an existing, central class instead of creating specialized new classes.
+    </p>
+
+    <p>
+        When a class attempts to do too much, code clarity vanishes. Developers working on unrelated features end up modifying the same file, leading to frequent merge conflicts, hidden state dependencies, and high risk of unexpected regression bugs.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Violates the Single Responsibility Principle (SRP) by managing multiple unrelated domain concerns.</li>
+        <li>Creates excessive coupling, making the class hard to understand, maintain, or mock in unit tests.</li>
+        <li>High risk of side effects where altering one field or method breaks completely unrelated functionality.</li>
+        <li>Significantly increases compilation times and causes constant source control merge conflicts.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        Refactor a Large Class when you notice distinct clusters of fields or methods that operate independently of the rest of the class:
+    </p>
+    <ul>
+        <li><strong>Extract Class:</strong> Move a group of related fields and their associated methods into a new, dedicated class.</li>
+        <li><strong>Extract Subclass / Interface:</strong> If parts of the class are only used in specific execution contexts or configurations, extract them into specialized subclasses or behind clean interfaces.</li>
+        <li><strong>Extract Domain Component:</strong> Group utility methods, validation logic, or formatting code into separate service components.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: A bloated User Account class handling profile data, authentication, and notification preferences
+public class UserAccount
+{
+    // Profile Data
+    public int UserId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+
+    // Authentication Data & Operations
+    public string PasswordHash { get; set; }
+    public string SecurityToken { get; set; }
+    public bool ValidatePassword(string password) =&gt; /* Hash & Compare */ true;
+    public void ResetPassword(string newPassword) { /* Reset Logic */ }
+
+    // Notification Preferences & Operations
+    public bool EmailNotificationsEnabled { get; set; }
+    public bool SmsNotificationsEnabled { get; set; }
+    public string PhoneNumber { get; set; }
+    public void SendSmsAlert(string message) { /* Send SMS */ }
+    public void SendEmailAlert(string message) { /* Send Email */ }
+}
+
+// AFTER (C#): Refactored by extracting distinct concerns into modular sub-components
+public class UserProfile
+{
+    public int UserId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+}
+
+public class UserAuthentication
+{
+    public string PasswordHash { get; set; }
+    public string SecurityToken { get; set; }
+
+    public bool ValidatePassword(string password) =&gt; /* Hash & Compare */ true;
+    public void ResetPassword(string newPassword) { /* Reset Logic */ }
+}
+
+public class UserNotifier
+{
+    public bool EmailNotificationsEnabled { get; set; }
+    public bool SmsNotificationsEnabled { get; set; }
+    public string PhoneNumber { get; set; }
+
+    public void SendSmsAlert(string message) { /* Send SMS */ }
+    public void SendEmailAlert(string message) { /* Send Email */ }
+}
+
+// Composition container aggregating the extracted responsibilities
+public class UserAccountRefactored
+{
+    public UserProfile Profile { get; set; } = new();
+    public UserAuthentication Auth { get; set; } = new();
+    public UserNotifier Notifier { get; set; } = new();
+}</code></pre>
+
+</article>

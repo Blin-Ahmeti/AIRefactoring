@@ -1,0 +1,97 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Improving Abstraction</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Improving Abstraction" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Improving Abstraction</strong> focuses on refining how software concepts, hierarchies, and interfaces are modeled within a system. It involves organizing classes, interfaces, and inheritance trees so that high-level policy is decoupled from low-level implementation details, enabling clean polymorphism and modular extensibility.
+    </p>
+
+    <p>
+        Over time, abstractions can degrade: superclasses become bloated with subclass-specific logic, interfaces expose implementation details, or concrete classes become tightly coupled to specific third-party dependencies. Improving abstraction realigns code with fundamental object-oriented principles like the Dependency Inversion Principle (DIP) and Liskov Substitution Principle (LSP).
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Decouples high-level business rules from concrete execution details and external dependencies.</li>
+        <li>Enhances flexibility by allowing new implementations to be plugged in without modifying existing client code (Open/Closed Principle).</li>
+        <li>Simplifies unit testing through interface-based dependency injection and mock objects.</li>
+        <li>Eliminates fragile type checks and manual type casting in favor of polymorphic dispatch.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique when you spot rigid dependency coupling, widespread conditional logic based on object types, or leaked implementation details across layers:
+    </p>
+    <ul>
+        <li><strong>Extract Interface / Abstract Class:</strong> Create clear abstractions to define contracts for operations with multiple potential implementations.</li>
+        <li><strong>Replace Conditional with Polymorphism:</strong> Replace complex <code>switch</code> or <code>if/else</code> type checks with polymorphic method calls on an abstract base class or interface.</li>
+        <li><strong>Form Template Method:</strong> Move shared invariant execution steps into an abstract superclass, delegating variant steps to concrete subclasses.</li>
+        <li><strong>Replace Inheritance with Delegation:</strong> If a subclass only uses a fraction of its parent class logic, replace the inheritance relationship with composition and interface delegation.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: High-level notification manager directly coupled to concrete implementations using type switches
+public class DirectNotificationSender
+{
+    public void SendAlert(string recipient, string message, string channelType)
+    {
+        // Rigid conditional branching violating Open/Closed and Dependency Inversion principles
+        if (channelType == "Email")
+        {
+            Console.WriteLine($"[SmtpClient] Sending Email to {recipient}: {message}");
+        }
+        else if (channelType == "Sms")
+        {
+            Console.WriteLine($"[TwilioClient] Sending SMS to {recipient}: {message}");
+        }
+        else
+        {
+            throw new NotSupportedException($"Channel type {channelType} is not supported.");
+        }
+    }
+}
+
+// AFTER (C#): Polymorphic abstraction with Interface & Dependency Inversion
+public interface INotificationChannel
+{
+    void Send(string recipient, string message);
+}
+
+public class EmailNotificationChannel : INotificationChannel
+{
+    public void Send(string recipient, string message) =&gt;
+        Console.WriteLine($"[SmtpClient] Sending Email to {recipient}: {message}");
+}
+
+public class SmsNotificationChannel : INotificationChannel
+{
+    public void Send(string recipient, string message) =&gt;
+        Console.WriteLine($"[TwilioClient] Sending SMS to {recipient}: {message}");
+}
+
+// Client depends solely on the abstract contract, making it open for extension but closed for modification
+public class NotificationService
+{
+    private readonly INotificationChannel _channel;
+
+    public NotificationService(INotificationChannel channel)
+    {
+        _channel = channel ?? throw new ArgumentNullException(nameof(channel));
+    }
+
+    public void SendAlert(string recipient, string message)
+    {
+        _channel.Send(recipient, message);
+    }
+}</code></pre>
+
+</article>

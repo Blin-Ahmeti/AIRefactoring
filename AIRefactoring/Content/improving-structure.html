@@ -1,0 +1,94 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Improving Structure</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Improving Structure" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Improving Structure</strong> encompasses structural refactoring techniques focused on reorganizing class hierarchies, encapsulating fields, and redistributing responsibilities across components. While routine code cleanups target statement-level clarity, structural improvement reorganizes the architecture to ensure high cohesion and loose coupling.
+    </p>
+
+    <p>
+        As applications evolve, original architectural boundaries become blurred. Data fields end up exposed publicly, methods sit in the wrong classes, and domain abstractions grow misplaced. Structural refactoring restores clean boundaries by moving fields and methods to their rightful owners and encapsulating state behind clear interfaces.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Enforces strong encapsulation by hiding internal class state and exposure.</li>
+        <li>Increases cohesion by grouping closely related fields and behaviors into distinct domain models.</li>
+        <li>Reduces coupling between classes, allowing components to evolve independently without cascade failures.</li>
+        <li>Facilitates unit testing by establishing clean dependency injection interfaces.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique when class relationships become tangled, or when a class frequently accesses another class's internal data:
+    </p>
+    <ul>
+        <li><strong>Encapsulate Field:</strong> Convert public fields into private fields accessible only through properties or getter/setter methods.</li>
+        <li><strong>Move Method / Move Field:</strong> Move methods or fields to the class that actually uses them most frequently.</li>
+        <li><strong>Extract Interface:</strong> Create explicit interfaces for concrete classes to decouple consumers from specific implementations.</li>
+        <li><strong>Hide Delegate:</strong> Introduce wrapper methods to prevent client code from navigating deep object graphs (enforcing the Law of Demeter).</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Poor encapsulation, primitive obsession, and misplaced responsibilities
+public class Order
+{
+    // Exposed mutable fields breaking encapsulation
+    public string StreetAddress;
+    public string City;
+    public string ZipCode;
+
+    // Misplaced method: Order is managing raw address formatting logic
+    public string GetFormattedShippingLabel()
+    {
+        return $"{StreetAddress}\n{City}, {ZipCode}";
+    }
+}
+
+public class OrderPrinter
+{
+    public void Print(Order order)
+    {
+        // Direct field access violating encapsulation
+        Console.WriteLine($"Shipping To: {order.StreetAddress}, {order.City}");
+    }
+}
+
+// AFTER (C#): Clean structural encapsulation with Value Objects and extracted responsibility
+public record Address(string StreetAddress, string City, string ZipCode)
+{
+    public string FormattedLabel =&gt; $"{StreetAddress}\n{City}, {ZipCode}";
+}
+
+public class OrderRefactored
+{
+    // Encapsulated property with private setter
+    public Address ShippingAddress { get; private set; }
+
+    public OrderRefactored(Address shippingAddress)
+    {
+        ShippingAddress = shippingAddress ?? throw new ArgumentNullException(nameof(shippingAddress));
+    }
+
+    public string GetShippingLabel() =&gt; ShippingAddress.FormattedLabel;
+}
+
+public class OrderPrinterRefactored
+{
+    public void Print(OrderRefactored order)
+    {
+        // Interacts cleanly with the encapsulated object hierarchy
+        Console.WriteLine($"Shipping To:\n{order.GetShippingLabel()}");
+    }
+}</code></pre>
+
+</article>

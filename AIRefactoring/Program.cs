@@ -1,4 +1,5 @@
 using AIRefactoring.Database;
+using AIRefactoring.Database.Seed;
 using AIRefactoring.Gemini;
 using Google.GenAI;
 
@@ -33,5 +34,16 @@ app.UseAuthorization();
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<ApplicationDbContext>();
+
+    var environment = scope.ServiceProvider
+        .GetRequiredService<IWebHostEnvironment>();
+
+    RefactoringCategorySeeder.Seed(context, environment);
+}
 
 app.Run();

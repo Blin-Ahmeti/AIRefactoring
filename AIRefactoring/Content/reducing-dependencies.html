@@ -1,0 +1,86 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Reducing Dependencies</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Reducing Dependencies" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Reducing Dependencies</strong> is a set of refactoring techniques targeted at minimizing tight coupling between modules, classes, and external libraries. When components are deeply interconnected, a change in one class often triggers a cascade of unexpected breakages throughout the system.
+    </p>
+
+    <p>
+        By breaking direct concrete dependencies and introducing abstractions, dependency injection, and event-driven patterns, software becomes modular. Reducing dependencies ensures that components can be developed, tested, updated, or swapped independently without impacting the rest of the application.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Prevents cascading failures across unrelated modules when business requirements change.</li>
+        <li>Enables isolated unit testing by replacing concrete infrastructure calls with test doubles (mocks/stubs).</li>
+        <li>Adheres to the Dependency Inversion Principle (DIP) and Law of Demeter.</li>
+        <li>Reduces compilation times and simplifies package management by lowering inter-module reliance.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique when classes directly instantiate high-level services, navigate long object chains (e.g., <code>a.GetB().GetC().DoSomething()</code>), or directly depend on volatile third-party frameworks:
+    </p>
+    <ul>
+        <li><strong>Dependency Injection (DI):</strong> Invert control by injecting dependencies via interfaces in class constructors instead of using <code>new</code> internally.</li>
+        <li><strong>Hide Delegate / Demeter Fix:</strong> Encapsulate nested delegation so callers do not need knowledge of hidden intermediate objects.</li>
+        <li><strong>Introduce Adapter / Facade:</strong> Wrap third-party libraries behind internal domain interfaces to isolate vendor changes.</li>
+        <li><strong>Replace Hardcoded References with Events/Observers:</strong> Decouple producers from consumers using events or mediator patterns.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Tightly coupled to concrete SQL database connection and SMTP client inside the business logic
+public class OrderService
+{
+    public void FinalizeOrder(int orderId, string customerEmail)
+    {
+        // Direct instantiation of concrete infrastructure components
+        var db = new SqlDatabaseConnection("Server=myServerAddress;Database=myDataBase;");
+        db.ExecuteQuery($"UPDATE Orders SET Status = 'Completed' WHERE Id = {orderId}");
+
+        var smtp = new DirectSmtpClient("smtp.mailserver.com");
+        smtp.SendMail(customerEmail, "Order Completed", "Your order has been processed.");
+    }
+}
+
+// AFTER (C#): Decoupled dependencies using interfaces and Constructor Injection
+public interface IOrderRepository
+{
+    void CompleteOrder(int orderId);
+}
+
+public interface INotificationService
+{
+    void SendNotification(string recipient, string subject, string body);
+}
+
+public class OrderServiceRefactored
+{
+    private readonly IOrderRepository _repository;
+    private readonly INotificationService _notifier;
+
+    // Dependencies are injected via interfaces, making the class easy to test and extend
+    public OrderServiceRefactored(IOrderRepository repository, INotificationService notifier)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+    }
+
+    public void FinalizeOrder(int orderId, string customerEmail)
+    {
+        _repository.CompleteOrder(orderId);
+        _notifier.SendNotification(customerEmail, "Order Completed", "Your order has been processed.");
+    }
+}</code></pre>
+
+</article>

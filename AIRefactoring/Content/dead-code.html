@@ -1,0 +1,82 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>Dead Code</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="Dead Code" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Dead Code</strong> refers to any section of source code—such as unused variables, unreachable parameters, uncalled private methods, obsolete classes, or commented-out code blocks—that is no longer executed or needed. Over time, codebases accumulate dead code as requirements evolve, features get deprecated, or temporary debugging hacks are forgotten.
+    </p>
+
+    <p>
+        While dead code might seem harmless because it doesn't run at runtime, it creates significant clutter and confusion. Maintainers spend valuable time reading, analyzing, and attempting to preserve code that has no actual purpose, increasing cognitive load and technical debt.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Wastes developer time during navigation, code reviews, and architectural comprehension.</li>
+        <li>Increases build times and inflates binary sizes unnecessarily.</li>
+        <li>Misleads developers into updating or maintaining tests for code that is never invoked.</li>
+        <li>Distorts code coverage metrics by introducing unexecutable branches.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        The remedy for dead code is simple and definitive: <strong>delete it without hesitation</strong>. Modern source control systems (like Git) preserve historical changes, so there is no need to keep commented-out code or unused paths "just in case."
+    </p>
+    <ul>
+        <li><strong>Inline / Remove Unused Elements:</strong> Delete unused parameters, variables, fields, and private helper methods flagged by static analysis tools or modern IDEs.</li>
+        <li><strong>Remove Dead Branches:</strong> Eliminate unreachable <code>if/else</code> paths or switch cases where conditions evaluate to constant <code>false</code> values.</li>
+        <li><strong>Collapse Hierarchy:</strong> Use <em>Collapse Hierarchy</em> if an abstract class or interface has only one concrete subclass that no longer needs abstraction.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: A service containing dead parameters, unused fields, unreachable branches, and commented-out code
+public class PaymentProcessor
+{
+    private readonly string _legacyGatewayUrl = "https://old-api.payments.com"; // Unused field
+    private readonly bool _isDebugMode = false;
+
+    public bool ProcessPayment(decimal amount, string currency, string debugNote) // Unused parameter
+    {
+        // DEAD CODE: Commented-out legacy implementation
+        // if (amount &lt; 0) return false;
+        // LegacyGateway.Send(amount);
+
+        if (_isDebugMode)
+        {
+            // Unreachable branch because _isDebugMode is constant false
+            Console.WriteLine($"[DEBUG] Processing payment of {amount}");
+        }
+
+        return ExecuteCharge(amount);
+    }
+
+    private bool ExecuteCharge(decimal amount) =&gt; true;
+
+    // DEAD CODE: Private method never called anywhere in the codebase
+    private void LogOldTransaction(int id)
+    {
+        Console.WriteLine($"Transaction ID: {id}");
+    }
+}
+
+// AFTER (C#): Clean, focused code with all dead elements completely removed
+public class PaymentProcessorRefactored
+{
+    public bool ProcessPayment(decimal amount)
+    {
+        return ExecuteCharge(amount);
+    }
+
+    private bool ExecuteCharge(decimal amount) =&gt; true;
+}</code></pre>
+
+</article>

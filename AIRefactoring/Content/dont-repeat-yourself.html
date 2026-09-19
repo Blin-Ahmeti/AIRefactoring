@@ -1,0 +1,82 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Principle</span>
+            <h1>Don't Repeat Yourself (DRY)</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringPrinciples.png" alt="Don't Repeat Yourself (DRY)" />
+        </div>
+    </div>
+
+    <p>
+        The <strong>Don't Repeat Yourself (DRY)</strong> principle states that <em>"Every piece of knowledge must have a single, unambiguous, authoritative representation within a system."</em> Originally formulated by Andy Hunt and Dave Thomas in <em>The Pragmatic Programmer</em>, DRY is aimed at reducing repetition of software patterns, replacing it with abstractions, or using data normalization to avoid redundancy.
+    </p>
+
+    <p>
+        Duplication in code introduces severe technical debt. When a business rule or algorithm changes, developers must remember to update every single instance across the codebase. Omission of even one place introduces inconsistent behavior and subtle bugs.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Reduces code duplication across business logic, UI layouts, and database schemas.</li>
+        <li>Improves maintainability by creating a single source of truth for every rule or calculation.</li>
+        <li>Decreases bug surface area—fixes applied in one central place resolve issues everywhere.</li>
+        <li>Enhances readability by replacing complex repeated blocks with clean, self-documenting function or class abstractions.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply DRY when you identify structurally identical logic or duplicate business rules repeated across two or more locations. Common techniques used to achieve DRY include <strong>Extract Method</strong>, <strong>Extract Class</strong>, or introducing centralized helper services. However, be cautious of over-abstraction (or "WET" - Write Everything Twice / Waste Everyone's Time): do not merge code that happens to look identical purely by coincidence if the underlying business reasons for them to change differ.
+    </p>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE DRY: Duplicated discount calculation across multiple order processors
+class StandardOrderProcessor {
+  public double calculateTotal(double subtotal, String userType) {
+    double total = subtotal;
+    if (userType.equals("VIP")) {
+      total = subtotal * 0.85; // 15% VIP discount
+    }
+    return total + (total * 0.08); // 8% tax
+  }
+}
+
+class ExpressOrderProcessor {
+  public double calculateTotal(double subtotal, String userType) {
+    double total = subtotal;
+    if (userType.equals("VIP")) {
+      total = subtotal * 0.85; // Duplicate logic: 15% VIP discount
+    }
+    return total + (total * 0.08) + 15.0; // 8% tax + flat shipping
+  }
+}
+
+// AFTER DRY: Extracted pricing rule into a centralized calculation method
+class PricingService {
+  public static double applyVipDiscount(double subtotal, String userType) {
+    return userType.equals("VIP") ? subtotal * 0.85 : subtotal;
+  }
+
+  public static double applyTax(double amount) {
+    return amount * 1.08;
+  }
+}
+
+class StandardOrderProcessor {
+  public double calculateTotal(double subtotal, String userType) {
+    double discounted = PricingService.applyVipDiscount(subtotal, userType);
+    return PricingService.applyTax(discounted);
+  }
+}
+
+class ExpressOrderProcessor {
+  public double calculateTotal(double subtotal, String userType) {
+    double discounted = PricingService.applyVipDiscount(subtotal, userType);
+    return PricingService.applyTax(discounted) + 15.0;
+  }
+}</code></pre>
+
+</article>

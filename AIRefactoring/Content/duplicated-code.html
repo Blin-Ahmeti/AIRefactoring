@@ -1,0 +1,95 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>Duplicated Code</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="Duplicated Code" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Duplicated Code</strong> is widely considered the top code smell in software development. It occurs when two or more code fragments are identical or structurally similar. Whether caused by copy-pasting existing logic or multiple developers independently implementing the same behavior, code duplication inflates the codebase and leads to maintenance headaches.
+    </p>
+
+    <p>
+        The primary danger of duplication is inconsistent modification: when a bug is found or a business rule changes, developers must update every duplicate fragment. If even one location is missed, the system falls into an inconsistent state, leading to hard-to-track regressions.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Significantly increases code maintenance overhead and review effort.</li>
+        <li>Creates high risk of bug propagation when updates are applied incompletely.</li>
+        <li>Often indicates missing abstractions, bad class hierarchy designs, or lack of team communication.</li>
+        <li>Resolved primarily by centralizing identical logic using core refactoring techniques.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        Refactor duplicated code whenever you spot identical or similar statements in two or more places:
+    </p>
+    <ul>
+        <li><strong>Same class:</strong> Use <em>Extract Method</em> and call the new method from both locations.</li>
+        <li><strong>Sibling subclasses:</strong> Use <em>Extract Method</em> followed by <em>Pull Up Method</em> to move shared logic into the common superclass.</li>
+        <li><strong>Unrelated classes:</strong> Use <em>Extract Class</em> or <em>Extract Component</em> to encapsulate the shared responsibility in a standalone service.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Duplicated shipping cost calculations across two distinct services
+public class DomesticOrderProcessor
+{
+    public decimal ProcessOrder(decimal itemTotal, decimal weight)
+    {
+        // Duplicated shipping calculation logic
+        decimal baseShipping = 5.00m;
+        decimal weightFee = weight * 1.50m;
+        decimal shippingCost = baseShipping + weightFee;
+
+        return itemTotal + shippingCost;
+    }
+}
+
+public class InternationalOrderProcessor
+{
+    public decimal ProcessOrder(decimal itemTotal, decimal weight, decimal customsFee)
+    {
+        // Duplicated shipping calculation logic
+        decimal baseShipping = 5.00m;
+        decimal weightFee = weight * 1.50m;
+        decimal shippingCost = baseShipping + weightFee;
+
+        return itemTotal + shippingCost + customsFee;
+    }
+}
+
+// AFTER (C#): Extracted shared calculation into a reusable calculator component
+public static class ShippingCalculator
+{
+    public static decimal CalculateStandardShipping(decimal weight)
+    {
+        const decimal baseShipping = 5.00m;
+        const decimal weightRate = 1.50m;
+        return baseShipping + (weight * weightRate);
+    }
+}
+
+public class DomesticOrderProcessor
+{
+    public decimal ProcessOrder(decimal itemTotal, decimal weight)
+    {
+        return itemTotal + ShippingCalculator.CalculateStandardShipping(weight);
+    }
+}
+
+public class InternationalOrderProcessor
+{
+    public decimal ProcessOrder(decimal itemTotal, decimal weight, decimal customsFee)
+    {
+        return itemTotal + ShippingCalculator.CalculateStandardShipping(weight) + customsFee;
+    }
+}</code></pre>
+
+</article>

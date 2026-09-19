@@ -369,42 +369,8 @@ li {
         color: #b87333;
     }
 
-.ai-chip {
-    position: absolute;
-    right: -30px;
-    bottom: 25px;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #d6c6b2;
-    border: 5px solid #b87333;
-    box-shadow: 6px 6px 0 rgba(0, 51, 102, 0.25);
-    z-index: 3;
-}
-
-.chip-face {
-    width: 60px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    background: #003366;
-    border: 2px solid #5e89a5;
-    border-radius: 4px;
-}
-
-
-    .chip-face span {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #9cc4d8;
-    }
-
 .learning-section {
-    padding-top: 5rem;
+    padding-top: 2rem;
 }
 
 .section-heading {
@@ -558,9 +524,31 @@ li {
 }
 
 .debt-icon {
-    color: #8b4c1d;
-    border-color: #8b4c1d;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.danger-triangle {
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 24px solid #ffb300;
+    position: relative;
+}
+
+    .danger-triangle::after {
+        content: "!";
+        position: absolute;
+        top: 6px;
+        left: -2px;
+        color: #000;
+        font-weight: bold;
+        font-size: 12px;
+        font-family: sans-serif;
+    }
 
 .ai-icon {
     color: #003366;
@@ -644,14 +632,6 @@ li {
     .code-window {
         width: 250px;
     }
-
-
-    .ai-chip {
-        right: -15px;
-        width: 80px;
-        height: 80px;
-    }
-
 
     .learning-section {
         padding-top: 3rem;

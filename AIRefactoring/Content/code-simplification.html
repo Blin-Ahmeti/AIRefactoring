@@ -1,0 +1,99 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Code Simplification</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Code Simplification" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Code Simplification</strong> is a broad category of refactoring techniques focused on streamlining conditional logic, flattening nested structures, and expressing intent directly through modern language idioms. Rather than changing what the code does, simplification eliminates structural clutter to make the code instantly understandable to anyone reading it.
+    </p>
+
+    <p>
+        Complex nested logic, excessive temporary variables, and multi-layered conditional branches create high cognitive overhead. By streamlining control flows, leveraging guard clauses, and taking advantage of expressive language features (like C# pattern matching and LINQ), developers can dramatically improve maintainability without altering functionality.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Flattens deep nesting to make the primary execution path clear at a glance.</li>
+        <li>Eliminates unnecessary intermediate variables using direct expressions or query methods.</li>
+        <li>Reduces cognitive load and lowers the likelihood of subtle edge-case bugs in conditional logic.</li>
+        <li>Leverages modern language features (guard clauses, switch expressions, null-coalescing) to write idiomatic code.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply Code Simplification whenever you encounter deeply nested <code>if/else</code> statements, manual collection iteration loops, or overly convoluted boolean evaluations:
+    </p>
+    <ul>
+        <li><strong>Replace Nested Conditionals with Guard Clauses:</strong> Exit early from a method when preconditions fail to keep the main happy path at the root indentation level.</li>
+        <li><strong>Decompose / Consolidate Conditional Expressions:</strong> Combine multiple conditions that lead to the same result, or extract complex boolean checks into self-describing properties/methods.</li>
+        <li><strong>Replace Loops with LINQ:</strong> Transform manual state-tracking loops into clear, declarative LINQ queries (e.g., <code>Where</code>, <code>Select</code>, <code>Any</code>).</li>
+        <li><strong>Replace Control Flags with Break/Return:</strong> Remove temporary boolean flag variables used solely to break out of loops or control flow.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Deeply nested conditionals, manual looping, and unnecessary temporary variables
+public class OrderService
+{
+    public decimal CalculateCustomerDiscount(User user, List&lt;Order&gt; orders)
+    {
+        decimal totalDiscount = 0;
+
+        if (user != null)
+        {
+            if (user.IsActive)
+            {
+                if (orders != null &amp;&amp; orders.Count &gt; 0)
+                {
+                    bool hasHighValueOrder = false;
+                    foreach (var order in orders)
+                    {
+                        if (order.TotalAmount &gt; 500)
+                        {
+                            hasHighValueOrder = true;
+                            break;
+                        }
+                    }
+
+                    if (hasHighValueOrder)
+                    {
+                        totalDiscount = 0.15m;
+                    }
+                    else
+                    {
+                        totalDiscount = 0.05m;
+                    }
+                }
+            }
+        }
+
+        return totalDiscount;
+    }
+}
+
+// AFTER (C#): Flattened structure using Guard Clauses and declarative LINQ
+public class OrderServiceRefactored
+{
+    public decimal CalculateCustomerDiscount(User? user, List&lt;Order&gt;? orders)
+    {
+        // Guard clauses to eliminate deep nesting
+        if (user is not { IsActive: true } || orders is not { Count: &gt; 0 })
+        {
+            return 0m;
+        }
+
+        // Declarative LINQ replaces manual loop and flag variable
+        bool hasHighValueOrder = orders.Any(o =&gt; o.TotalAmount &gt; 500);
+
+        return hasHighValueOrder ? 0.15m : 0.05m;
+    }
+}</code></pre>
+
+</article>

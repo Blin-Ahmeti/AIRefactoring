@@ -1,0 +1,82 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Principle</span>
+            <h1>Single Responsibility Principle (SRP)</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringPrinciples.png" alt="Single Responsibility Principle" />
+        </div>
+    </div>
+
+    <p>
+        The <strong>Single Responsibility Principle (SRP)</strong> is the first principle of SOLID, formulated by Robert C. Martin. It states that <em>"A class should have one, and only one, reason to change."</em> In other words, a single module, class, or function should be responsible for only one specific actor, role, or domain concern within the software.
+    </p>
+
+    <p>
+        When a class attempts to handle multiple distinct responsibilities—such as mixing database persistence, business rules, and presentation formatting—it becomes fragile. Changes requested by one stakeholder (e.g., changing the invoice PDF layout) risk breaking functionality relied on by another (e.g., tax computation logic).
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>High cohesion and low coupling across classes and modules.</li>
+        <li>Easier maintenance: changes to one domain area do not ripple into unrelated functionality.</li>
+        <li>Significantly improved unit testing, as dependencies can be easily mocked or tested in isolation.</li>
+        <li>Prevents "God Objects" that swell to thousands of lines and become unmaintainable over time.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply SRP when you notice a class handling multiple distinct tasks or serving different actors. Common refactoring techniques to enforce SRP include <strong>Extract Class</strong> and <strong>Extract Method</strong>. If describing what a class does requires using the word "and" repeatedly, it is a strong signal that SRP is being violated.
+    </p>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE SRP VIOLATION: One class handles business calculations, formatting, AND persistence
+public class Invoice {
+  private double amount;
+
+  public Invoice(double amount) {
+    this.amount = amount;
+  }
+
+  public double calculateTotal() {
+    return this.amount * 1.20; // Includes tax
+  }
+
+  public void saveToDatabase() {
+    System.out.println("Saving invoice to database...");
+  }
+
+  public String generateHtmlReport() {
+    return "&lt;div&gt;Invoice Total: " + calculateTotal() + "&lt;/div&gt;";
+  }
+}
+
+// AFTER SRP: Separated into dedicated classes with single, well-defined roles
+public class Invoice {
+  private double amount;
+
+  public Invoice(double amount) {
+    this.amount = amount;
+  }
+
+  public double calculateTotal() {
+    return this.amount * 1.20;
+  }
+}
+
+public class InvoiceRepository {
+  public void save(Invoice invoice) {
+    System.out.println("Saving invoice to database...");
+  }
+}
+
+public class InvoiceFormatter {
+  public String toHtml(Invoice invoice) {
+    return "&lt;div&gt;Invoice Total: " + invoice.calculateTotal() + "&lt;/div&gt;";
+  }
+}</code></pre>
+
+</article>

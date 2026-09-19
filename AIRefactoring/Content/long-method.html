@@ -1,0 +1,120 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>Long Method</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="Long Method" />
+        </div>
+    </div>
+
+    <p>
+        A <strong>Long Method</strong> is a method, function, or procedure that has grown far too long, containing too many lines of code, complex conditional logic, or nested control structures. As a rule of thumb, the longer a method is, the harder it is to understand, debug, test, and maintain.
+    </p>
+
+    <p>
+        Long methods often develop incrementally over time when developers repeatedly add "just a few more lines" to implement new features or patch bugs. Eventually, the method loses cohesion, breaks the Single Responsibility Principle, and forces maintainers to read dozens of lines just to understand a single high-level step.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Increases cognitive load and makes code significantly harder to read and audit.</li>
+        <li>Conceals underlying duplication and tightly couples unrelated operations.</li>
+        <li>Makes unit testing painful or impossible due to too many hidden paths and execution flows.</li>
+        <li>Often indicates that a single method is trying to orchestrate multiple distinct business responsibilities.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        Whenever you find yourself needing to write a comment to explain what a block of code within a method does, that block is a primary candidate for extraction.
+    </p>
+    <ul>
+        <li><strong>Extract Method:</strong> Isolate logical sections of the method into smaller, well-named helper methods.</li>
+        <li><strong>Reduce Temporary Variables:</strong> Use <em>Replace Temp with Query</em> or inline temp variables to simplify parameter passing between extracted methods.</li>
+        <li><strong>Decompose Conditionals:</strong> Move complex <code>if/else</code> branch conditions into dedicated boolean predicate methods.</li>
+        <li><strong>Replace Method with Method Object:</strong> If local variables are so deeply tangled that extraction is difficult, turn the method itself into a standalone class.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: A long method performing validation, tax calculations, invoice generation, and notification
+public class InvoiceManager
+{
+    public void ProcessMonthlyInvoice(User user, List&lt;OrderItem&gt; items)
+    {
+        // Validation logic
+        if (user == null || !user.IsActive)
+            throw new InvalidOperationException("User is invalid or inactive.");
+        if (items == null || items.Count == 0)
+            throw new ArgumentException("Order items cannot be empty.");
+
+        // Subtotal & Tax Calculation logic
+        decimal subtotal = 0;
+        foreach (var item in items)
+        {
+            subtotal += item.Price * item.Quantity;
+        }
+
+        decimal taxRate = user.Country == "US" ? 0.07m : 0.15m;
+        decimal tax = subtotal * taxRate;
+        decimal total = subtotal + tax;
+
+        // Invoice formatting & printing logic
+        string invoiceBody = $"Invoice for {user.Name}\nSubtotal: {subtotal:C}\nTax: {tax:C}\nTotal: {total:C}";
+        Console.WriteLine(invoiceBody);
+
+        // Notification logic
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            Console.WriteLine($"Sending invoice email to {user.Email}...");
+        }
+    }
+}
+
+// AFTER (C#): Decomposed into clean, modular, and single-purpose helper methods
+public class InvoiceManagerRefactored
+{
+    public void ProcessMonthlyInvoice(User user, List&lt;OrderItem&gt; items)
+    {
+        ValidateRequest(user, items);
+
+        decimal total = CalculateTotalAmount(user, items);
+        string invoiceBody = FormatInvoice(user, total);
+        
+        PrintInvoice(invoiceBody);
+        SendEmailNotification(user, invoiceBody);
+    }
+
+    private void ValidateRequest(User user, List&lt;OrderItem&gt; items)
+    {
+        if (user == null || !user.IsActive)
+            throw new InvalidOperationException("User is invalid or inactive.");
+        if (items == null || items.Count == 0)
+            throw new ArgumentException("Order items cannot be empty.");
+    }
+
+    private decimal CalculateTotalAmount(User user, List&lt;OrderItem&gt; items)
+    {
+        decimal subtotal = items.Sum(item =&gt; item.Price * item.Quantity);
+        decimal taxRate = user.Country == "US" ? 0.07m : 0.15m;
+        return subtotal + (subtotal * taxRate);
+    }
+
+    private string FormatInvoice(User user, decimal total) =&gt;
+        $"Invoice for {user.Name}\nTotal Amount: {total:C}";
+
+    private void PrintInvoice(string invoiceBody) =&gt;
+        Console.WriteLine(invoiceBody);
+
+    private void SendEmailNotification(User user, string invoiceBody)
+    {
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            Console.WriteLine($"Sending invoice email to {user.Email}...");
+        }
+    }
+}</code></pre>
+
+</article>

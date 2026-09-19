@@ -1,0 +1,90 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Removing Duplication</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Removing Duplication" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Removing Duplication</strong> is a foundational set of refactoring techniques designed to consolidate identical or structurally similar code fragments into a single authoritative source. While <em>Duplicated Code</em> identifies the smell, this technique provides the practical mechanics to eliminate it across different structural scopes—within a single class, across sibling subclasses, or between unrelated modules.
+    </p>
+
+    <p>
+        Consolidating duplicate logic directly enforces the DRY (Don't Repeat Yourself) principle. By centralizing shared behavior into well-named methods, base classes, or injected services, developers ensure that future updates or bug fixes only need to occur in one place.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Directly eliminates technical debt caused by copy-pasted or redundant logic.</li>
+        <li>Creates clear abstractions and establishes single authoritative sources of truth.</li>
+        <li>Minimizes maintenance risk by ensuring business rule changes apply universally.</li>
+        <li>Combines structural refactoring patterns like Extract Method, Pull Up Method, and Form Template Method.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique whenever you spot duplicated logic across functions, classes, or class hierarchies:
+    </p>
+    <ul>
+        <li><strong>Extract Method:</strong> Move duplicate statements within the same class into a shared private helper method.</li>
+        <li><strong>Pull Up Method:</strong> If two subclasses contain identical methods, extract the shared logic into a common parent superclass.</li>
+        <li><strong>Form Template Method:</strong> If subclasses execute the same algorithm structure but differ in specific steps, encapsulate the invariant steps in a base template method and delegate variant steps via abstract calls.</li>
+        <li><strong>Extract Class / Service:</strong> If unrelated classes share identical behavior, extract the functionality into a dedicated service component and inject it.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Sibling classes duplicating the structure of a report generation workflow
+public class HtmlReportGenerator
+{
+    public void GenerateReport()
+    {
+        Console.WriteLine("&lt;header&gt;Report Header&lt;/header&gt;");
+        Console.WriteLine("&lt;body&gt;HTML Content&lt;/body&gt;"); // Variant step
+        Console.WriteLine("&lt;footer&gt;Report Footer&lt;/footer&gt;");
+    }
+}
+
+public class PdfReportGenerator
+{
+    public void GenerateReport()
+    {
+        Console.WriteLine("&lt;header&gt;Report Header&lt;/header&gt;");
+        Console.WriteLine("[PDF Binary Data]"); // Variant step
+        Console.WriteLine("&lt;footer&gt;Report Footer&lt;/footer&gt;");
+    }
+}
+
+// AFTER (C#): Consolidated using the Template Method pattern to remove duplication
+public abstract class ReportGeneratorBase
+{
+    // Shared template method enforcing workflow structure
+    public void GenerateReport()
+    {
+        PrintHeader();
+        PrintBody(); // Polymorphic variant step
+        PrintFooter();
+    }
+
+    private void PrintHeader() =&gt; Console.WriteLine("&lt;header&gt;Report Header&lt;/header&gt;");
+    private void PrintFooter() =&gt; Console.WriteLine("&lt;footer&gt;Report Footer&lt;/footer&gt;");
+
+    protected abstract void PrintBody();
+}
+
+public class HtmlReportGeneratorRefactored : ReportGeneratorBase
+{
+    protected override void PrintBody() =&gt; Console.WriteLine("&lt;body&gt;HTML Content&lt;/body&gt;");
+}
+
+public class PdfReportGeneratorRefactored : ReportGeneratorBase
+{
+    protected override void PrintBody() =&gt; Console.WriteLine("[PDF Binary Data]");
+}</code></pre>
+
+</article>

@@ -1,0 +1,61 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Principle</span>
+            <h1>Boy Scout Rule</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringPrinciples.png" alt="Boy Scout Rule" />
+        </div>
+    </div>
+
+    <p>
+        The <strong>Boy Scout Rule</strong> is a core clean-code habit famously popularized by Robert C. Martin ("Uncle Bob"): <em>"Always leave the campground cleaner than you found it."</em> In software engineering terms, every time a developer touches a module, file, or function, they should leave the code in a slightly better state than it was in before.
+    </p>
+
+    <p>
+        Software naturally tends toward entropy over time—a phenomenon known as code rot. Instead of waiting for technical debt to accumulate to a breaking point that requires a massive, risky rewrite, the Boy Scout Rule encourages small, opportunistic, continuous improvements as part of daily development workflows.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Fights software rot through continuous, micro-level refactoring.</li>
+        <li>Keeps refactoring safe by focusing on small, high-confidence changes while working on existing tasks.</li>
+        <li>Prevents the need for large, dangerous, and expensive system-wide rewrites.</li>
+        <li>Fosters a culture of collective code ownership and ongoing quality improvement.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply the Boy Scout Rule during your everyday bug fixes and feature development. Small edits count: renaming a confusing variable, extracting a noisy 5-line block into a helper function, fixing a typo in comments, or deleting obsolete dead code. <strong>Rule of thumb:</strong> Keep your cleanup scoped closely to the area you are actively editing. Avoid giant scope creep that turns a simple task into an unreviewable Pull Request.
+    </p>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Cryptic names and unorganized logic found while adding a feature
+public boolean chk(User u) {
+  // Check if user active
+  if (u.getSts() == 1) {
+    long d = (System.currentTimeMillis() - u.getLastLogin()) / (1000 * 60 * 60 * 24);
+    if (d > 365) {
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+// AFTER: Applying the Boy Scout Rule (clearer names, extracted intent)
+public boolean isUserAccountActiveAndEligible(User user) {
+  if (user.isInactive()) {
+    return false;
+  }
+  
+  long daysSinceLastLogin = user.getDaysSinceLastLogin();
+  boolean isInactiveForOverAYear = daysSinceLastLogin > 365;
+
+  return !isInactiveForOverAYear;
+}</code></pre>
+
+</article>

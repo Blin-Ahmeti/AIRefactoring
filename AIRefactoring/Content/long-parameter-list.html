@@ -1,0 +1,80 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>Long Parameter List</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="Long Parameter List" />
+        </div>
+    </div>
+
+    <p>
+        A <strong>Long Parameter List</strong> occurs when a method or constructor accepts too many parameters—typically more than three or four. Long parameter lists make code hard to read, difficult to call correctly, and prone to subtle bugs caused by passing arguments in the wrong order (especially when multiple parameters share the same data type).
+    </p>
+
+    <p>
+        This smell often develops when procedural code is adapted for object-oriented systems, or when developers continuously pass flags and configuration details down through multiple layers of method calls instead of passing objects that already encapsulate those values.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Decreases readability and developer productivity by requiring constant checking of parameter order and types.</li>
+        <li>High vulnerability to silent bugs when adjacent parameters share types (e.g., multiple consecutive <code>string</code> or <code>bool</code> values).</li>
+        <li>Creates rigid coupling between callers and callees whenever method signatures change.</li>
+        <li>Often signals that the method is taking on too many responsibilities or missing a cohesive domain abstraction.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        Refactor long parameter lists whenever calling a method feels clumsy or requires constantly inspecting its signature:
+    </p>
+    <ul>
+        <li><strong>Introduce Parameter Object:</strong> Group related parameters into a single class or <code>struct</code> (e.g., combining <code>startDate</code> and <code>endDate</code> into a <code>DateRange</code> object).</li>
+        <li><strong>Preserve Whole Object:</strong> Instead of extracting multiple values from an object and passing them individually, pass the original object itself.</li>
+        <li><strong>Replace Parameter with Method Call:</strong> If a parameter value can be retrieved by invoking another method on an existing object, remove the parameter and call that method internally.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: A method taking a long list of individual user creation parameters
+public class UserService
+{
+    public void RegisterUser(
+        string firstName, 
+        string lastName, 
+        string email, 
+        string street, 
+        string city, 
+        string zipCode, 
+        string country, 
+        bool sendWelcomeEmail)
+    {
+        // Registration and address processing logic...
+        Console.WriteLine($"Registering {firstName} {lastName} living in {city}, {country}.");
+    }
+}
+
+// AFTER (C#): Refactored using Parameter Objects (Address & Registration Request DTOs)
+public record Address(string Street, string City, string ZipCode, string Country);
+
+public class UserRegistrationRequest
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public Address Address { get; set; } = null!;
+    public bool SendWelcomeEmail { get; set; } = true;
+}
+
+public class UserServiceRefactored
+{
+    public void RegisterUser(UserRegistrationRequest request)
+    {
+        // Clean, readable method signature and parameter access
+        Console.WriteLine($"Registering {request.FirstName} {request.LastName} living in {request.Address.City}, {request.Address.Country}.");
+    }
+}</code></pre>
+
+</article>

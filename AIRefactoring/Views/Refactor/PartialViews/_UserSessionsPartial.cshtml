@@ -20,7 +20,7 @@
 		{
 			<a class="sidebar-item @(item.Id == Model.CurrentSessionId ? "active" : "")"
 			   data-session-id="@item.Id"
-			   href="@Url.Action("Index", "Home", new { sessionId = item.Id })">
+			   href="@Url.Action("Index", "Refactor", new { sessionId = item.Id })">
 				@item.Title
 			</a>
 		}

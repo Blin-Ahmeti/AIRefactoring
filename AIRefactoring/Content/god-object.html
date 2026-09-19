@@ -1,0 +1,112 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Code Smell</span>
+            <h1>God Object</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/CodeSmells.png" alt="God Object" />
+        </div>
+    </div>
+
+    <p>
+        A <strong>God Object</strong> (also known as a <em>God Class</em> or <em>Omniscient Class</em>) is an anti-pattern and extreme form of the Large Class code smell. It refers to an object that knows too much or does too much, centralization of an application's overall processing, state, and business rules into a single monolithic entity.
+    </p>
+
+    <p>
+        God Objects turn object-oriented software into procedural code. Surrounding classes are reduced to passive data holders (Anemic Domain Models) with simple getters and setters, while the God Object orchestrates every operation. This creates a fragile, highly coupled architecture where even minor changes carry severe regression risks across the system.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Completely destroys modularity and encapsulation by hoarding data and control flow.</li>
+        <li>Leads to massive file sizes (thousands of lines of code) that hinder developer comprehension and team collaboration.</li>
+        <li>Triggers constant merge conflicts and compile-time bottlenecks in multi-developer environments.</li>
+        <li>Makes unit testing nearly impossible due to deeply entangled global state and unmockable dependencies.</li>
+    </ul>
+
+    <h3>When & How to Refactor</h3>
+    <p>
+        Refactoring a God Object requires decomposing it into smaller, cohesive domain components:
+    </p>
+    <ul>
+        <li><strong>Extract Class:</strong> Break off logical sub-domains (e.g., authentication, billing, notifications) into independent classes.</li>
+        <li><strong>Move Method & Move Field:</strong> Relocate methods and fields back into the passive data classes they operate on, restoring true Object-Oriented behavior.</li>
+        <li><strong>Facade / Mediator Pattern:</strong> Replace the monolithic manager with lightweight facade or mediator services that coordinate specialized components.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: A God Object holding all state and executing all operations across sub-domains
+public class SystemManager
+{
+    // Customer state & actions
+    public string CustomerName { get; set; } = string.Empty;
+    public string CustomerEmail { get; set; } = string.Empty;
+
+    // Inventory state & actions
+    public Dictionary&lt;string, int&gt; Inventory { get; set; } = new();
+
+    // Order state & actions
+    public List&lt;string&gt; OrderHistory { get; set; } = new();
+
+    public void ExecuteFullSystemCycle(string item, int qty)
+    {
+        // 1. Inventory check
+        if (Inventory.ContainsKey(item) &amp;&amp; Inventory[item] &gt;= qty)
+        {
+            Inventory[item] -= qty;
+
+            // 2. Order creation
+            OrderHistory.Add($"Ordered {qty}x {item}");
+
+            // 3. Email notification
+            Console.WriteLine($"Sending confirmation email to {CustomerEmail}...");
+        }
+    }
+}
+
+// AFTER (C#): Decoupled into specialized domain objects co-locating data and behavior
+public class Customer
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+}
+
+public class InventoryService
+{
+    private readonly Dictionary&lt;string, int&gt; _stock = new();
+
+    public bool TryDeductStock(string item, int quantity)
+    {
+        if (_stock.TryGetValue(item, out int count) &amp;&amp; count &gt;= quantity)
+        {
+            _stock[item] -= quantity;
+            return true;
+        }
+        return false;
+    }
+}
+
+public class OrderProcessor
+{
+    private readonly InventoryService _inventory;
+    private readonly INotificationService _notifier;
+
+    public OrderProcessor(InventoryService inventory, INotificationService notifier)
+    {
+        _inventory = inventory;
+        _notifier = notifier;
+    }
+
+    public bool PlaceOrder(Customer customer, string item, int quantity)
+    {
+        if (!_inventory.TryDeductStock(item, quantity)) return false;
+
+        _notifier.SendEmail(customer.Email, $"Order placed for {quantity}x {item}");
+        return true;
+    }
+}</code></pre>
+
+</article>

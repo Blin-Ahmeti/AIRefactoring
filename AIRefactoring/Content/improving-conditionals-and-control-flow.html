@@ -1,0 +1,100 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Improving Conditionals and Control Flow</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Improving Conditionals and Control Flow" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Improving Conditionals and Control Flow</strong> is a targeted refactoring technique focused on simplifying branching logic, untangling nested conditional trees, and eliminating state-tracking control flags. Control flow structures often become overly complex as new business rules and edge cases are added over time.
+    </p>
+
+    <p>
+        Complex conditional logic forces developers to keep multiple mental states in mind while reading code. By consolidating duplicate branches, decomposing boolean expressions, replacing <code>switch</code> statements with pattern matching, or replacing complex evaluation trees with lookup tables, control flow becomes linear and predictable.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Flattens complex control trees into clear, linear execution flows.</li>
+        <li>Consolidates identical outcome branches to reduce boilerplate and duplication.</li>
+        <li>Replaces imperative state-tracking flags with explicit <code>break</code>, <code>continue</code>, or early <code>return</code> statements.</li>
+        <li>Leverages modern C# pattern matching and switch expressions to make branching logic concise and self-documenting.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique whenever conditional branching spans multiple nesting levels or when branch conditions are difficult to decipher:
+    </p>
+    <ul>
+        <li><strong>Consolidate Conditional Expression:</strong> If a sequence of conditional checks leads to the same outcome, combine them into a single compound expression using logical operators.</li>
+        <li><strong>Decompose Conditional:</strong> Extract complex boolean evaluations into private, well-named predicate helper methods.</li>
+        <li><strong>Replace Control Flag with Break/Return:</strong> Remove temporary boolean flags (e.g., <code>bool isDone = false;</code>) used solely to exit loops or control branching.</li>
+        <li><strong>Replace Switch/If with Pattern Matching or Dictionary Lookup:</strong> Simplify complex type or value checking by utilizing C# switch expressions or key-based action lookups.</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Deeply nested conditional branching, magic numbers, and control flags
+public class ShippingRateCalculator
+{
+    public decimal GetRate(string destination, double weight, bool isExpress)
+    {
+        decimal rate = 0;
+        bool isHandled = false;
+
+        if (destination == "US" || destination == "CA")
+        {
+            if (weight &lt; 5.0)
+            {
+                if (isExpress)
+                {
+                    rate = 15.00m;
+                    isHandled = true;
+                }
+                else
+                {
+                    rate = 8.00m;
+                    isHandled = true;
+                }
+            }
+            else
+            {
+                rate = isExpress ? 25.00m : 14.00m;
+                isHandled = true;
+            }
+        }
+
+        if (!isHandled)
+        {
+            rate = isExpress ? 50.00m : 30.00m;
+        }
+
+        return rate;
+    }
+}
+
+// AFTER (C#): Clean control flow using Guard Clauses, C# Pattern Matching, and Switch Expressions
+public class ShippingRateCalculatorRefactored
+{
+    public decimal GetRate(string destination, double weight, bool isExpress)
+    {
+        bool isNorthAmerica = destination is "US" or "CA";
+
+        return (isNorthAmerica, weight, isExpress) switch
+        {
+            (true, &lt; 5.0, true)   =&gt; 15.00m,
+            (true, &lt; 5.0, false)  =&gt; 8.00m,
+            (true, _, true)       =&gt; 25.00m,
+            (true, _, false)      =&gt; 14.00m,
+            (false, _, true)      =&gt; 50.00m,
+            (false, _, false)     =&gt; 30.00m
+        };
+    }
+}</code></pre>
+
+</article>

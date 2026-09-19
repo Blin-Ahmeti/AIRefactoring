@@ -1,0 +1,69 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Principle</span>
+            <h1>Keep It Simple (KISS)</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringPrinciples.png" alt="Keep It Simple" />
+        </div>
+    </div>
+
+    <p>
+        The <strong>Keep It Simple (KISS)</strong> principle asserts that most systems work best if they are kept simple rather than made complicated. Simplicity should be a key goal in design, and unnecessary complexity should be avoided at all costs. Over-engineering code by anticipating speculative future requirements often leads to bloated, hard-to-maintain codebases.
+    </p>
+
+    <p>
+        In software refactoring, KISS reminds developers that the cleverest or most abstract solution is rarely the best one. Striving for clear, straightforward C# code ensures that future maintainers can understand and modify the logic without needing to mentally execute intricate design patterns.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Prioritizes clear, readable C# logic over overly complex or clever implementations.</li>
+        <li>Reduces cognitive load for team members reading, debugging, or extending code.</li>
+        <li>Prevents premature abstraction and over-engineering (YAGNI - You Aren't Gonna Need It).</li>
+        <li>Lowers bug frequency by minimizing intricate conditional branches and layer abstractions.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply KISS when you encounter code that uses excessive design patterns, deep inheritance trees, or overly complex algorithms for basic tasks. Refactor by flattening unnecessary abstraction layers, replacing complex bitwise or custom evaluation tricks with built-in C# methods, and breaking down monolithic methods into simple, readable steps.
+    </p>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Over-engineered evaluation with nested ternary operators and unnecessary abstraction
+public class SimpleDiscountEvaluator
+{
+    public decimal CalculateDiscount(decimal price, bool isMember, bool isHoliday)
+    {
+        return price &gt; 100 
+            ? (isMember ? (isHoliday ? price * 0.30m : price * 0.20m) : (isHoliday ? price * 0.15m : price * 0.10m)) 
+            : (isMember ? (isHoliday ? price * 0.15m : price * 0.05m) : 0m);
+    }
+}
+
+// AFTER: Clean, readable, and straightforward logic using modern pattern matching
+public class DiscountCalculator
+{
+    public decimal CalculateDiscount(decimal price, bool isMember, bool isHoliday)
+    {
+        if (price &lt;= 0) return 0m;
+
+        decimal discountRate = (price &gt; 100, isMember, isHoliday) switch
+        {
+            (true, true, true)   =&gt; 0.30m,
+            (true, true, false)  =&gt; 0.20m,
+            (true, false, true)  =&gt; 0.15m,
+            (true, false, false) =&gt; 0.10m,
+            (false, true, true)  =&gt; 0.15m,
+            (false, true, false) =&gt; 0.05m,
+            _                    =&gt; 0.00m
+        };
+
+        return price * discountRate;
+    }
+}</code></pre>
+
+</article>

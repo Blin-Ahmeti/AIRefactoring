@@ -1,0 +1,86 @@
+﻿<article class="rf-card">
+
+    <div class="rf-card-header">
+        <div class="header-text">
+            <span class="badge">Refactoring Technique</span>
+            <h1>Improving Naming</h1>
+        </div>
+
+        <div class="header-image">
+            <img src="/img/RefactoringTechniques.png" style="max-width: 200px;" alt="Improving Naming" />
+        </div>
+    </div>
+
+    <p>
+        <strong>Improving Naming</strong> is the refactoring practice of replacing vague, misleading, or overly abbreviated names with clear, self-explanatory identifiers for variables, methods, parameters, and classes. Code is read far more often than it is written, making expressive naming one of the most effective ways to lower cognitive load and convey developer intent.
+    </p>
+
+    <p>
+        Cryptic identifiers like single-letter variables, magic constants, or generic function names force developers to read through entire method implementations just to deduce what a value represents. By adopting intent-revealing names, the code becomes self-documenting, reducing the reliance on easily outdated comments.
+    </p>
+
+    <h3>Key Takeaways</h3>
+    <ul>
+        <li>Makes code self-documenting, significantly reducing the need for line-level comments.</li>
+        <li>Decreases developer onboarding time and accelerates daily code reviews.</li>
+        <li>Eliminates ambiguity around units of measurement, domain contexts, and boolean states.</li>
+        <li>Prevents accidental bugs caused by misinterpreting what a method or variable actually does.</li>
+    </ul>
+
+    <h3>When & How to Apply</h3>
+    <p>
+        Apply this technique whenever a name requires mental translation or fails to explicitly describe its purpose:
+    </p>
+    <ul>
+        <li><strong>Rename Method / Variable:</strong> Use modern IDE automated refactoring tools to rename cryptic variables or functions across the entire solution safely.</li>
+        <li><strong>Express Intent Over Implementation:</strong> Name methods after <em>what</em> they achieve rather than <em>how</em> they perform it internally.</li>
+        <li><strong>Use Pronounceable & Searchable Names:</strong> Avoid obscure abbreviations or single-letter names (except for standard short loop counters like <code>i</code>).</li>
+        <li><strong>Incorporate Units or Context:</strong> Append explicit terms when working with quantities or durations (e.g., <code>timeoutInMilliseconds</code> or <code>priceInUsd</code>).</li>
+    </ul>
+
+    <h3>Example / Usage</h3>
+    <pre><code>// BEFORE: Cryptic variable names, magic numbers, and unclear method intent
+public class Processor
+{
+    // What do these numbers or variables mean without reading the code?
+    public decimal Calc(decimal p, int t)
+    {
+        decimal d = 0;
+        if (t == 1)
+        {
+            d = p * 0.10m;
+        }
+        else if (t == 2)
+        {
+            d = p * 0.20m;
+        }
+        return p - d;
+    }
+}
+
+// AFTER (C#): Self-documenting code using expressive names and clear domain enums
+public enum CustomerTier
+{
+    Standard = 1,
+    Premium = 2
+}
+
+public class DiscountCalculator
+{
+    private const decimal StandardDiscountRate = 0.10m;
+    private const decimal PremiumDiscountRate = 0.20m;
+
+    public decimal CalculateFinalPrice(decimal originalPrice, CustomerTier tier)
+    {
+        decimal discountAmount = tier switch
+        {
+            CustomerTier.Standard =&gt; originalPrice * StandardDiscountRate,
+            CustomerTier.Premium  =&gt; originalPrice * PremiumDiscountRate,
+            _                     =&gt; 0m
+        };
+
+        return originalPrice - discountAmount;
+    }
+}</code></pre>
+
+</article>
