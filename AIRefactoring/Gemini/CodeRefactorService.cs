@@ -42,16 +42,18 @@ namespace AIRefactoring.Gemini
 			};
 		}
 
-		public async Task<RefactorResponse> RefactorCodeAsync(string code)
+		public async Task<RefactorResponse> RefactorCodeAsync(string prompt, bool includeTitle)
 		{
-			if (string.IsNullOrWhiteSpace(code))
+			if (string.IsNullOrWhiteSpace(prompt))
 				return new();
 
-			var title = await client.Models.GenerateContentAsync(model, code, titleConfig);
+			GenerateContentResponse? title = null;
+			if (includeTitle)
+				title = await client.Models.GenerateContentAsync(model, prompt, titleConfig);
 
-			var response = await client.Models.GenerateContentAsync(model, code, config);
+			var response = await client.Models.GenerateContentAsync(model, prompt, config);
 
-			var validation = validator.Validate(code, response?.Text);
+			var validation = validator.Validate(prompt, response?.Text);
 
 			if (!validation.IsValid)
 			{

@@ -50,13 +50,16 @@ namespace AIRefactoring.Controllers
 			var userSession = dbContext.UserSessions.FirstOrDefault(x => x.Id == request.UserSessionId)
 				?? new UserSession() { GuestIdentifier = request.GuestIdentifier };
 
+			bool includeTitle = false;
 			if (userSession.Id == Guid.Empty)
 			{
+				includeTitle = true;
 				dbContext.Add(userSession);
 			}
 
-			var response = await codeRefactorService.RefactorCodeAsync(request.Prompt);
-			userSession.Title = response.Title;
+			var response = await codeRefactorService.RefactorCodeAsync(request.Prompt, includeTitle);
+			if (includeTitle)
+				userSession.Title = response.Title;
 
 			var codeArtifact = new CodeArtifact
 			{

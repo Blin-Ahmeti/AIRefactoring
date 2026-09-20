@@ -14,12 +14,7 @@
 				return ValidationResult.Failure(
 					"The response contains Markdown code fences.");
 
-			if (refactoredCode.Contains("Here is the refactored code",
-					StringComparison.OrdinalIgnoreCase))
-				return ValidationResult.Failure(
-					"The response contains explanatory text.");
-
-			if (refactoredCode.Length > 100_000)
+			if (refactoredCode.Length > 500_000)
 				return ValidationResult.Failure(
 					"The refactored code exceeds the maximum allowed size.");
 

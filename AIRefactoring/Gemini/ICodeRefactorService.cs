@@ -4,6 +4,6 @@ namespace AIRefactoring.Gemini
 {
 	public interface ICodeRefactorService
 	{
-		Task<RefactorResponse> RefactorCodeAsync(string code);
+		Task<RefactorResponse> RefactorCodeAsync(string code, bool includeTitle);
 	}
 }

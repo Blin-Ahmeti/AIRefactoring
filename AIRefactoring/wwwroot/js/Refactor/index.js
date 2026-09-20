@@ -111,7 +111,13 @@ async function refactorCode(guestIdentifier, refactorButton, codeInput)
 
         if (!response.ok)
         {
-            throw new Error(`Request failed: ${response.status}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Request failed',
+                text: `${response.status}: AIRefactoring was unable to process this request.`,
+                confirmButtonColor: '#d33'
+            });
+            console.log(`Request failed: ${response.status}`);
         }
 
         const result = await response.json();
