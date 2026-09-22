@@ -225,7 +225,7 @@ function updateConversationResponse(messageGroup, response, createdAt)
 
     if (responseContent)
     {
-        responseContent.textContent = response;
+        responseContent.innerHTML = sanitizeHtml(response);
     }
 
     const messageDate = messageGroup.querySelector(".message-date");
@@ -370,4 +370,44 @@ function replaceURLParam(sessionId)
     }
 
     window.history.replaceState({}, "", url);
+}
+
+function sanitizeHtml(html)
+{
+    const allowedTags = [
+        "H2", "H3", "P",
+        "STRONG", "EM", "MARK",
+        "UL", "OL", "LI",
+        "BLOCKQUOTE",
+        "PRE", "CODE",
+        "BR", "HR"
+    ];
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    function clean(element)
+    {
+        if (element.nodeType !== Node.ELEMENT_NODE)
+        {
+            return;
+        }
+
+        if (!allowedTags.includes(element.tagName))
+        {
+            element.replaceWith(...element.childNodes);
+            return;
+        }
+
+        while (element.attributes.length > 0)
+        {
+            element.removeAttribute(element.attributes[0].name);
+        }
+
+        [...element.children].forEach(clean);
+    }
+
+    [...template.content.children].forEach(clean);
+
+    return template.innerHTML;
 }

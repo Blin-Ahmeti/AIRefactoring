@@ -123,8 +123,6 @@ li {
     transition: opacity 0.3s ease;
 }
 
-/* Welcome container */
-
 .welcome-message {
     width: 100%;
     max-width: 1400px;

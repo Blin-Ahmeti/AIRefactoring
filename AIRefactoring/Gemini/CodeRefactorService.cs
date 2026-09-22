@@ -17,7 +17,7 @@ namespace AIRefactoring.Gemini
 		{
 			this.client = client;
 			this.validator = validator;
-			model = configuration["Gemini:ModelOptions:Model"] ?? "gemini-3.6-flash";
+			model = configuration["Gemini:ModelOptions:Model"] ?? "gemini-3.5-flash-lite";
 			config = new GenerateContentConfig
 			{
 				Temperature = configuration.GetValue<double>("Gemini:ModelOptions:Temperature", 0.0),

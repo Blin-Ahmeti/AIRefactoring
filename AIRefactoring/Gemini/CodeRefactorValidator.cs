@@ -10,10 +10,6 @@
 			if (string.IsNullOrWhiteSpace(refactoredCode))
 				return ValidationResult.Failure("Refactored code cannot be empty.");
 
-			if (refactoredCode.Contains("```"))
-				return ValidationResult.Failure(
-					"The response contains Markdown code fences.");
-
 			if (refactoredCode.Length > 500_000)
 				return ValidationResult.Failure(
 					"The refactored code exceeds the maximum allowed size.");
