@@ -47,11 +47,11 @@ namespace AIRefactoring.Gemini
 			if (string.IsNullOrWhiteSpace(prompt))
 				return new();
 
+			var response = await client.Models.GenerateContentAsync(model, prompt, config);
+
 			GenerateContentResponse? title = null;
 			if (includeTitle)
 				title = await client.Models.GenerateContentAsync(model, prompt, titleConfig);
-
-			var response = await client.Models.GenerateContentAsync(model, prompt, config);
 
 			var validation = validator.Validate(prompt, response?.Text);
 
